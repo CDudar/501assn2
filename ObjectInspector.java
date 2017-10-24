@@ -55,6 +55,7 @@ public class ObjectInspector
 	inspectInterfaces(obj, ObjClass, objectsToInspect);
 	inspectConstructors(obj, ObjClass, objectsToInspect);
 	inspectFields(obj, ObjClass,objectsToInspect);
+	inspectMethods(obj, ObjClass, objectsToInspect);
 	
 	if(recursive)
 	    inspectFieldClasses( obj, ObjClass, objectsToInspect, recursive);
@@ -171,8 +172,51 @@ public class ObjectInspector
     
     private void inspectMethods(Object obj, Class ObjClass, Vector objectsToInspect)
     {
-    	
-    	
+    	if(ObjClass.getDeclaredMethods().length >= 1)
+    	{
+    		Method[] methods = ObjClass.getDeclaredMethods();
+    		
+    			for(int i = 0; i < methods.length; i++)
+    			{
+    				
+    				System.out.println("------Method------");
+    				
+    				Method method = methods[i];
+    				System.out.println("Name " + method.getName());
+    				
+    				Class[] exceptions = method.getExceptionTypes();
+    				Class[] parameterTypes = method.getParameterTypes();
+    				String modifiers = Modifier.toString(method.getModifiers());
+    				Class returnType = method.getReturnType();
+    				
+    				
+    				System.out.println("Modifiers: " + modifiers);
+    				
+    				System.out.printf("Parameters: ");
+        			for(Class parameter:parameterTypes)
+        			{
+        				System.out.printf(parameter.getName() + ", ");
+        				
+        			}
+        			System.out.println();
+        			
+        			System.out.printf("Exceptions: ");
+        			for(Class exception: exceptions)
+        			{
+        				System.out.printf(exception.getName() + ", ");
+        			}
+        			System.out.println();
+        			
+        			System.out.println("Return Type: " + returnType.getName());
+    				
+    				
+    			}
+    		
+    		
+    	}
+    	else{
+    		
+    	}
     	
     	
     }
@@ -218,9 +262,10 @@ public class ObjectInspector
 				
 			}
 	
+
+	    }
+	
 		if(ObjClass.getSuperclass() != null)
 		    inspectFields(obj, ObjClass.getSuperclass() , objectsToInspect);
-	    }
-		
     }
 }
