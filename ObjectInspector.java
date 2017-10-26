@@ -25,6 +25,9 @@ import java.lang.reflect.*;
 
 public class ObjectInspector
 {
+	
+	HashMap<Object, Integer> ObjectsInspected = new HashMap<Object, Integer>();
+	
     public ObjectInspector() { }
 
     //-----------------------------------------------------------
@@ -32,6 +35,9 @@ public class ObjectInspector
     {
 	Vector objectsToInspect = new Vector();
 	Class ObjClass = obj.getClass();
+	
+	
+	ObjectsInspected.put(obj, 1);
 
 	
 
@@ -52,10 +58,19 @@ public class ObjectInspector
 	
 	
 	//inspect the current class
-	inspectInterfaces(obj, ObjClass, objectsToInspect);
+
 	inspectConstructors(obj, ObjClass, objectsToInspect);
 	inspectFields(obj, ObjClass,objectsToInspect);
-	inspectMethods(obj, ObjClass, objectsToInspect);
+	inspectMethods(obj, ObjClass, objectsToInspect);	
+	inspectInterfaces(obj, ObjClass, objectsToInspect);	
+	
+	System.out.println(objectsToInspect.size() + " objects found");
+	//for(int i = 0; i < objectsToInspect.size(); i++) 
+	//{
+		System.out.println(objectsToInspect);
+	//}
+	System.out.println("DONE");
+	
 	
 	if(recursive)
 	    inspectFieldClasses( obj, ObjClass, objectsToInspect, recursive);
@@ -85,10 +100,21 @@ public class ObjectInspector
 		
 		try
 		    {
-			System.out.println("******************");
-			inspect( f.get(obj) , recursive);
-			System.out.println("******************");
-		    }
+			
+				if(!ObjectsInspected.containsKey(f.get(obj))) {
+				
+				System.out.println("******************");
+				inspect( f.get(obj) , recursive);
+				System.out.println("DONE RECURSING");
+				
+				System.out.println("******************");
+			    
+				}
+				else {
+					System.out.println("OBJECT ALREADY INSPECTED, SKIPPING" + f.get(obj));
+				}
+				
+			}
 		catch(Exception exp) { exp.printStackTrace(); }
 	    }
     }
@@ -97,6 +123,8 @@ public class ObjectInspector
     //-----------------------------------------------------------
     private void inspectInterfaces(Object obj, Class ObjClass, Vector objectsToInspect)
     {
+    	
+    	System.out.println("=====Interfaces for: " + ObjClass.getName() + "=====");
     	
     	if(ObjClass.getInterfaces() != null )
     	{
@@ -120,6 +148,13 @@ public class ObjectInspector
     		System.out.println("No interfaces");
     		
     	}
+    	
+    	
+    	if(ObjClass.getSuperclass() != null) {
+    		inspectInterfaces(obj, ObjClass.getSuperclass(), objectsToInspect);
+    		
+    	}
+    	
     
     
     }
@@ -134,6 +169,9 @@ public class ObjectInspector
     //-----------------------------------------------------------
     private void inspectConstructors(Object obj, Class ObjClass, Vector objectsToInspect)
     {
+    	
+    	
+    	System.out.println("=====Constructors for: " + ObjClass.getName() + "=====");
     	
     	if(ObjClass.getConstructors().length >= 1)
     	{
@@ -165,6 +203,11 @@ public class ObjectInspector
     		
     	}
     	
+    	if(ObjClass.getSuperclass() != null) {
+    		inspectConstructors(obj, ObjClass.getSuperclass(), objectsToInspect);
+    		
+    	}
+    	
     	
     	System.out.println("------Done Constructors------");
     	
@@ -172,6 +215,10 @@ public class ObjectInspector
     
     private void inspectMethods(Object obj, Class ObjClass, Vector objectsToInspect)
     {
+    	
+    	System.out.println("=====Methods for: " + ObjClass.getName() + "=====");
+    	
+    	
     	if(ObjClass.getDeclaredMethods().length >= 1)
     	{
     		Method[] methods = ObjClass.getDeclaredMethods();
@@ -214,9 +261,12 @@ public class ObjectInspector
     		
     		
     	}
-    	else{
+    	
+    	if(ObjClass.getSuperclass() != null) {
+    		inspectMethods(obj, ObjClass.getSuperclass(), objectsToInspect);
     		
     	}
+
     	
     	
     }
@@ -226,6 +276,9 @@ public class ObjectInspector
     private void inspectFields(Object obj,Class ObjClass,Vector objectsToInspect)
   
     {
+    	
+    	System.out.println("=====Fields for: " + ObjClass.getName() + "=====");
+    	
 	
 		if(ObjClass.getDeclaredFields().length >= 1)
 	    {
