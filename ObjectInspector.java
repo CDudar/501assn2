@@ -71,6 +71,7 @@ public class ObjectInspector
 	//}
 	System.out.println("DONE");
 	
+	//parseOutArrayContents
 	
 	if(recursive)
 	    inspectFieldClasses( obj, ObjClass, objectsToInspect, recursive);
@@ -102,7 +103,7 @@ public class ObjectInspector
 		    {
 			
 				if(!ObjectsInspected.containsKey(f.get(obj))) {
-				
+					
 				System.out.println("******************");
 				inspect( f.get(obj) , recursive);
 				System.out.println("DONE RECURSING");
