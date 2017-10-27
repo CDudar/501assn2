@@ -89,9 +89,7 @@ public class Asst2TestDriver
 			System.out.println("Loading object inspector: " + args[0]);
 			Asst2TestDriver driver = new Asst2TestDriver(args[0],rec);
 			
-			driver.runTest(new ArrayTestClass());
-			
-			/*
+				
 			driver.runTest( new ClassA() );
 			driver.runTest( new ClassA(12) );
 			driver.runTest( new ClassB() );
@@ -100,7 +98,7 @@ public class Asst2TestDriver
 			driver.runTest( new ClassB[12] );
 			driver.runTest( new ClassB[12][12] );	
 			driver.runTest( "Test String" );
-			*/
+		
 		    }
 		catch(Exception e)
 		    {
