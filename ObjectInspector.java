@@ -34,7 +34,17 @@ public class ObjectInspector
     public void inspect(Object obj, boolean recursive)
     {
 	Vector objectsToInspect = new Vector();
-	Class ObjClass = obj.getClass();
+	
+	Class ObjClass;
+	
+	if(obj == null) {
+		return;
+	}
+	
+	
+	ObjClass = obj.getClass();
+
+
 	
 	
 	ObjectsInspected.put(obj, 1);
@@ -65,13 +75,11 @@ public class ObjectInspector
 	inspectInterfaces(obj, ObjClass, objectsToInspect);	
 	
 	System.out.println(objectsToInspect.size() + " objects found");
-	//for(int i = 0; i < objectsToInspect.size(); i++) 
-	//{
-		System.out.println(objectsToInspect);
-	//}
-	System.out.println("DONE");
-	
-	//parseOutArrayContents
+
+	System.out.println(objectsToInspect);
+
+		
+	System.out.println("\n\n\n");
 	
 	if(recursive)
 	    inspectFieldClasses( obj, ObjClass, objectsToInspect, recursive);
@@ -96,23 +104,85 @@ public class ObjectInspector
 	Enumeration e = objectsToInspect.elements();
 	while(e.hasMoreElements())
 	    {
-		Field f = (Field) e.nextElement();
+		
+		
+		Field f = null;
+		Object fieldObject = null;
+		try{
+			f = (Field) e.nextElement();
+			fieldObject = f.get(obj);
+		}
+		catch (IllegalArgumentException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		} catch (IllegalAccessException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		}
+		
 		System.out.println("Inspecting Field: " + f.getName() );
 		
 		try
 		    {
 			
-				if(!ObjectsInspected.containsKey(f.get(obj))) {
-					
-				System.out.println("******************");
-				inspect( f.get(obj) , recursive);
-				System.out.println("DONE RECURSING");
+				if(!ObjectsInspected.containsKey(fieldObject)) {
 				
-				System.out.println("******************");
-			    
+
+					if(fieldObject == null) {
+						return;
+					}
+					
+					
+					
+					if(fieldObject.getClass().isArray()) {
+						
+						Class<?> componentType = (fieldObject.getClass().getComponentType());
+						
+						
+							if(componentType.isPrimitive()) {
+								
+								List primList = (Arrays.asList(fieldObject));
+									
+								
+								for(int i = 0; i < primList.size(); i++) {
+									
+									System.out.println("Index: " + i + " Value = " + primList.get(i));
+								}
+								
+								
+							}
+							else {
+								System.out.println("=====Recursing on array of objects=====");
+
+								
+								for(int i = 0; i < Array.getLength(fieldObject); i++) {
+									System.out.println("====Index: " + i + "=====");
+									System.out.println("Contents (full inspection):");
+									Object cObj = Array.get(fieldObject, i);
+									inspect(cObj, recursive);
+
+									
+								}
+								
+								
+							}
+							
+							System.out.println("\n\n\n\n");
+						
+						
+						
+					}
+						else {
+						
+					System.out.println("******************");
+					inspect( fieldObject , recursive);
+					System.out.println("DONE THIS BRANCH");
+					
+					System.out.println("******************");
+							}
 				}
 				else {
-					System.out.println("OBJECT ALREADY INSPECTED, SKIPPING" + f.get(obj));
+					System.out.println("OBJECT ALREADY INSPECTED, SKIPPING" + fieldObject);
 				}
 				
 			}
@@ -150,6 +220,7 @@ public class ObjectInspector
     		
     	}
     	
+    	System.out.println("------Done Interfaces------");
     	
     	if(ObjClass.getSuperclass() != null) {
     		inspectInterfaces(obj, ObjClass.getSuperclass(), objectsToInspect);
@@ -203,6 +274,8 @@ public class ObjectInspector
     		
     		
     	}
+
+    	System.out.println("------Done Constructors------");
     	
     	if(ObjClass.getSuperclass() != null) {
     		inspectConstructors(obj, ObjClass.getSuperclass(), objectsToInspect);
@@ -210,7 +283,7 @@ public class ObjectInspector
     	}
     	
     	
-    	System.out.println("------Done Constructors------");
+
     	
     }
     
@@ -263,6 +336,9 @@ public class ObjectInspector
     		
     	}
     	
+    	System.out.println("------Done Methods------");
+    	
+    	
     	if(ObjClass.getSuperclass() != null) {
     		inspectMethods(obj, ObjClass.getSuperclass(), objectsToInspect);
     		
@@ -292,6 +368,19 @@ public class ObjectInspector
 				Field field = fields[i];
 				field.setAccessible(true);
 				
+				Object fieldObject = null;
+				
+				try {
+					fieldObject = field.get(obj);
+				}
+				catch (IllegalArgumentException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				} catch (IllegalAccessException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+				
 				
 				if(! field.getType().isPrimitive() ) 
 				    objectsToInspect.addElement( field );
@@ -300,7 +389,7 @@ public class ObjectInspector
 				System.out.println("------Field------");
 				
 				try{
-				System.out.println("Field: " + field.getName() + " = " + field.get(obj));
+				System.out.println("Field: " + field.getName() + " = " + fieldObject);
 				System.out.println("Field Type: " + field.getType() );
 				//System.out.println("Field Type: " + field.getGenericType() );
 				System.out.println("Modifiers: " + Modifier.toString(field.getModifiers()));
@@ -310,14 +399,13 @@ public class ObjectInspector
 					System.out.println("This object " + ObjClass.getName()
 					+ "does not specify the field" + field.getName());
 				}
-				catch(IllegalAccessException e1){
-					System.out.println("Access not allowed for " + field.getName());
-				}
 				
 			}
 	
 
 	    }
+		
+    	System.out.println("------Done Fields------");
 	
 		if(ObjClass.getSuperclass() != null)
 		    inspectFields(obj, ObjClass.getSuperclass() , objectsToInspect);
