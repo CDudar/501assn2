@@ -1,3 +1,14 @@
+
+
+/** CPSC 501 ASSIGNMENT 2
+ * 	Christian Dudar
+ */
+
+
+
+/** BELOW DISCLAIMER WAS INCLUDED IN ZIP FILE WE WERE GIVEN
+
+
 /*==========================================================================
 File: ObjectInspector.java
 Purpose:Demo Object inspector for the Asst2TestDriver
@@ -8,8 +19,8 @@ Created on:  Oct 23, 2005
 Last Updated: Oct 23, 2005
 
 ***********************************************************************
-If you are going to reproduce this code in any way for your asignment 
-rember to include my name at the top of the file toindicate where you
+If you are going to reproduce this code in any way for your assignment 
+remember to include my name at the top of the file to indicate where you
 got the original code from
 ***********************************************************************
 
@@ -38,6 +49,7 @@ public class ObjectInspector
 	Class ObjClass;
 	
 	if(obj == null) {
+		System.out.println("Object to be inspected is null");
 		return;
 	}
 	
@@ -129,6 +141,7 @@ public class ObjectInspector
 				
 
 					if(fieldObject == null) {
+						System.out.println("Object to be inspected is null");
 						return;
 					}
 					
@@ -141,19 +154,26 @@ public class ObjectInspector
 						
 							if(componentType.isPrimitive()) {
 								
-								List primList = (Arrays.asList(fieldObject));
-									
 								
-								for(int i = 0; i < primList.size(); i++) {
+								System.out.println("=====Inspecting Primitve Array:=====");
+								
+								System.out.println("Component Type: " + fieldObject.getClass().getComponentType());
+								
+								System.out.println("Length: " + Array.getLength(fieldObject));
+								
+								for(int i = 0; i < Array.getLength(fieldObject); i++) {
 									
-									System.out.println("Index: " + i + " Value = " + primList.get(i));
+									System.out.println("Index: " + i + " Value = " + (Array.get(fieldObject, i)));
 								}
 								
 								
 							}
 							else {
 								System.out.println("=====Recursing on array of objects=====");
-
+								
+								System.out.println("Component Type: " + fieldObject.getClass().getComponentType());
+								
+								System.out.println("Length: " + Array.getLength(fieldObject));
 								
 								for(int i = 0; i < Array.getLength(fieldObject); i++) {
 									System.out.println("====Index: " + i + "=====");
@@ -236,7 +256,7 @@ public class ObjectInspector
     
     
     
-    
+    static String testString = "";
     
     //-----------------------------------------------------------
     private void inspectConstructors(Object obj, Class ObjClass, Vector objectsToInspect)
@@ -244,6 +264,8 @@ public class ObjectInspector
     	
     	
     	System.out.println("=====Constructors for: " + ObjClass.getName() + "=====");
+    	testString += "=====Constructors for: " + ObjClass.getName() + "=====\n";
+    	
     	
     	if(ObjClass.getConstructors().length >= 1)
     	{
@@ -260,13 +282,16 @@ public class ObjectInspector
     			System.out.printf("------Constructor------"
     					+ "\nModifier(s): " + modifiers + "\n");
     			
+    			testString += "------Constructor------" + "\nModifier(s): " + modifiers + "\n";
+    			
     			System.out.printf("Parameters: ");
     			for(Class parameter:parameterTypes)
     			{
     				System.out.printf(parameter.getName() + ", ");
-    				
+    				testString += parameter.getName() + ", ";
     			}
     			System.out.println();
+    			testString += "\n";
     			
     			
     		}
@@ -276,6 +301,7 @@ public class ObjectInspector
     	}
 
     	System.out.println("------Done Constructors------");
+    	testString += "------Done Constructors------\n";
     	
     	if(ObjClass.getSuperclass() != null) {
     		inspectConstructors(obj, ObjClass.getSuperclass(), objectsToInspect);
@@ -409,5 +435,13 @@ public class ObjectInspector
 	
 		if(ObjClass.getSuperclass() != null)
 		    inspectFields(obj, ObjClass.getSuperclass() , objectsToInspect);
+    }
+    
+    
+    public static String getTestString() {
+    	String returnString = testString;
+    	testString = "";
+    	
+    	return returnString;
     }
 }
